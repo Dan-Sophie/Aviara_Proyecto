@@ -1,0 +1,8 @@
+# Ignorar secretos
+secrets.py
+
+# Ignorar archivos temporales y entorno
+__pycache__/
+db.sqlite3
+venv/
+.env

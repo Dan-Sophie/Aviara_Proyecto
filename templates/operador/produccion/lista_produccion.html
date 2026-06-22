@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <!-- Navegación superior -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i> Volver al Dashboard
+        </a>
+        <a href="{% url 'registrar_produccion_operador' %}" class="btn btn-warning text-white rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fas fa-plus-circle me-2"></i> Nuevo Registro
+        </a>
+    </div>
+
+    <!-- Título y Resumen -->
+    <div class="mb-4">
+        <h2 class="fw-black text-dark display-6 mb-1">Historial de Producción</h2>
+        <p class="text-muted">Bitácora detallada de recolecciones y novedades de {{ request.user.username|title }}</p>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">
+                    <tr>
+                        <th class="ps-3 py-3">Lote / Galpón</th>
+                        <th>Fecha</th>
+                        <th>Recolección</th>
+                        <th>Mortalidad</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for registro in registros %}
+                    <tr class="align-middle">
+                        <td class="ps-3 fw-bold text-dark">{{ registro.lote.codigo_lote }}</td>
+                        <td class="text-nowrap">{{ registro.fecha_produccion|date:"d M, Y" }}</td>
+                        <td>
+                            <span class="badge bg-amber-50 text-amber-700 px-3 py-2 border border-amber-100 rounded-pill">
+                                {{ registro.cantidad_recolectada }} unidades
+                            </span>
+                        </td>
+                        <td>
+                            {% if registro.mortalidad_del_dia > 0 %}
+                                <span class="badge bg-rose-50 text-rose-600 px-3 py-2 border border-rose-100 rounded-pill">
+                                    {{ registro.mortalidad_del_dia }} bajas
+                                </span>
+                            {% else %}
+                                <span class="text-muted small italic">Sin novedades</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted" style="max-width: 250px;">{{ registro.observaciones|truncatechars:50|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="p-4 rounded-4 bg-light d-inline-block">
+                                <i class="fas fa-egg fa-2x text-warning mb-2"></i>
+                                <p class="mb-0 text-muted">Aún no hay registros en el historial.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos personalizados para mantener la paleta */
+    .bg-amber-50 { background-color: #fffbeb; }
+    .text-amber-700 { color: #b45309; }
+    .bg-rose-50 { background-color: #fff1f2; }
+    .text-rose-600 { color: #e11d48; }
+    .rounded-4 { border-radius: 1.5rem !important; }
+    .fw-black { font-weight: 900; }
+    
+    /* Efecto al pasar el cursor por las filas */
+    .table-hover tbody tr:hover {
+        background-color: #fffcf8 !important;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

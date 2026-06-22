@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container py-5" style="animation: fadeIn 0.4s ease-out;">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            
+            <div class="mb-4 text-center text-sm-start">
+                <h1 class="fw-bold tracking-tight" style="color: #630E20; font-size: 2.2rem; margin-bottom: 4px; font-weight: 800;">
+                    Reportar Nueva Merma
+                </h1>
+                <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                    Módulo de Operador | Ajuste rápido y control físico de existencias.
+                </p>
+            </div>
+
+            <div class="card shadow-sm border-0" style="border-radius: 18px; overflow: hidden; background-color: #ffffff;">
+                
+                <div style="height: 6px; background: linear-gradient(90deg, #E2583E, #630E20);"></div>
+                
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="p-3 mb-4 d-flex align-items-start" style="background-color: #FFF5F3; border-left: 4px solid #E2583E; border-radius: 8px;">
+                        <span class="me-3" style="font-size: 1.2rem; color: #E2583E;">📋</span>
+                        <p class="mb-0 text-secondary small style-instruction" style="line-height: 1.4;">
+                            Por favor, registre la pérdida detectada con precisión. Recuerde que el campo de <strong>observaciones es estrictamente obligatorio</strong> para la auditoría y posterior aprobación del Administrador.
+                        </p>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 10px;">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" novalidate class="d-flex flex-column gap-1">
+                        {% csrf_token %}
+                        
+                        <div class="crispy-custom-wrapper">
+                            {{ form|crispy }}
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-2">
+                            <a href="{% url 'lista_mermas' %}" class="btn btn-light border fw-semibold px-4 action-btn-secondary" style="border-radius: 10px; padding: 10px 20px; color: #4a5568;">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn text-white fw-bold px-4 action-btn-primary" style="background-color: #E2583E; border-radius: 10px; padding: 10px 24px; border: none; transition: all 0.2s ease;">
+                                Enviar Reporte de Pérdida
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilización sobre los inputs generados automáticamente por Crispy Forms */
+    .crispy-custom-wrapper label {
+        font-weight: 600 !important;
+        color: #4a5568 !important;
+        font-size: 0.85rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .crispy-custom-wrapper input, 
+    .crispy-custom-wrapper select, 
+    .crispy-custom-wrapper textarea {
+        border-radius: 10px !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 10px 12px !important;
+        font-size: 0.95rem !important;
+        color: #2d3748 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .crispy-custom-wrapper input:focus, 
+    .crispy-custom-wrapper select:focus, 
+    .crispy-custom-wrapper textarea:focus {
+        border-color: #E2583E !important;
+        box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15) !important;
+        outline: none !important;
+    }
+
+    /* Animación y efectos en botones */
+    .action-btn-primary:hover {
+        background-color: #cc472e !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(226, 88, 62, 0.25);
+    }
+
+    .action-btn-secondary:hover {
+        background-color: #f7fafc !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

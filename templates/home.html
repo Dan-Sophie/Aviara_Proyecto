@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-xl shadow-md">
+    <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">¡Bienvenida al Sistema Aviara!</h2>
+    <p class="text-gray-600 mb-8 text-center">Gestiona tus lotes, productos y ventas de manera eficiente.</p>
+    
+    <!-- Tarjetas de Acceso Rápido -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-4 border-l-4 border-green-500 shadow-sm">
+            <h3 class="font-bold text-lg">Producción</h3>
+            <p class="text-sm text-gray-500">Control de lotes y mortalidad de aves.</p>
+        </div>
+        <div class="card p-4 border-l-4 border-blue-500 shadow-sm">
+            <h3 class="font-bold text-lg">Catálogo</h3>
+            <p class="text-sm text-gray-500">Gestión de productos agrícolas y avícolas.</p>
+        </div>
+        <div class="card p-4 border-l-4 border-orange-500 shadow-sm">
+            <h3 class="font-bold text-lg">Inventario</h3>
+            <p class="text-sm text-gray-500">Registro de mermas y existencias.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
