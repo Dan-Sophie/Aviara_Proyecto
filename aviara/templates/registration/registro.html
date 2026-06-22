@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh; padding: 30px 0;">
+    <div class="col-md-7 col-lg-5">
+        <div class="card border-0 shadow-lg p-3" style="border-radius: 25px; background-color: #ffffff;">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h1 class="fw-bold" style="color: #630E20; letter-spacing: -1.5px; margin-bottom: 2px; font-size: 2.2rem;">Crear Cuenta</h1>
+                    <p class="text-muted uppercase tracking-widest" style="font-size: 0.7rem; font-weight: 600;">REGISTRO DE USUARIO AVIARA</p>
+                </div>
+                
+                <form method="POST" id="registroForm">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold mb-1" style="color: #333; font-size: 0.9rem; display: block;">
+                                {{ field.label }}
+                            </label>
+
+                            <div class="input-group">
+                                {{ field }}
+                                {% if 'password' in field.name %}
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('{{ field.auto_id }}')" 
+                                        style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #eee; background-color: #f8f9fa; padding: 0 15px;">
+                                    <span id="icon-{{ field.auto_id }}" style="font-size: 0.9rem;">👁️</span>
+                                </button>
+                                {% endif %}
+                            </div>
+
+                            {% if field.help_text %}
+                                <div class="form-text italic text-muted mt-1" style="font-size: 0.75rem; opacity: 0.8;">
+                                    {{ field.help_text|safe }}
+                                </div>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger fw-bold mt-1" style="font-size: 0.75rem;">× {{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn w-100 py-2 mt-3" 
+                            style="background-color: #630E20; color: white; border-radius: 12px; border: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease;">
+                        Finalizar Registro
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted" style="font-size: 0.85rem;">¿Ya eres parte de Aviara? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: #630E20;">Inicia sesión</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(el => {
+            el.classList.add('form-control');
+            el.style.backgroundColor = "#f8f9fa";
+            el.style.borderRadius = "12px";
+            el.style.border = "1px solid #e2e8f0";
+            el.style.padding = "10px 15px"; 
+            el.style.fontSize = "0.9rem";   
+            el.style.transition = "all 0.2s ease";
+
+            // ELIMINAR MÁXIMO DE CARACTERES EN TELÉFONO
+            if (el.name === 'telefono') {
+                el.removeAttribute('maxlength');
+            }
+            
+            el.addEventListener('focus', () => {
+                el.style.borderColor = "#630E20";
+                el.style.backgroundColor = "#fff";
+                el.style.boxShadow = "0 0 0 3px rgba(99, 14, 32, 0.1)";
+            });
+            el.addEventListener('blur', () => {
+                el.style.borderColor = "#e2e8f0";
+                el.style.backgroundColor = "#f8f9fa";
+                el.style.boxShadow = "none";
+            });
+        });
+    });
+
+    function togglePassword(fieldId) {
+        const input = document.getElementById(fieldId);
+        const icon = document.getElementById('icon-' + fieldId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerText = "🔒";
+        } else {
+            input.type = "password";
+            icon.innerText = "👁️";
+        }
+    }
+</script>
+{% endblock %}

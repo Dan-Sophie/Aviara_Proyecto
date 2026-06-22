@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4 p-md-5" style="background-color: #f4f6f5; min-height: 100vh;">
+    <div class="container-fluid max-width-container">
+        
+        <header class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold tracking-tight" style="color: #630E20; font-size: 2.2rem; margin-bottom: 4px;">
+                    Modificar Usuario
+                </h1>
+                <p class="text-muted mb-0" style="font-size: 0.95rem; font-weight: 500;">
+                    Actualizando perfil de: <span class="badge bg-light text-dark border px-2 py-1 fw-semibold">{{ usuario.username }}</span>
+                </p>
+            </div>
+            
+            <div>
+                <a href="{% url 'lista_usuarios' %}" class="btn btn-white px-3 shadow-sm d-flex align-items-center back-btn" 
+                   style="border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #4a5568; font-weight: 600; height: 42px; transition: all 0.2s;">
+                    <span style="margin-right: 8px;"></span> Volver a la Lista
+                </a>
+            </div>
+        </header>
+
+        <div class="row g-4 align-items-stretch"> 
+            
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background-color: white;">
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                {% for field in form %}
+                                    {% if field.name == 'is_staff' or field.name == 'is_active' %}
+                                    <div class="col-md-6">
+                                        <div class="p-3 d-flex align-items-center justify-content-between system-switch-box">
+                                            <div>
+                                                <label class="fw-bold small text-uppercase d-block mb-1" style="color: #630E20; letter-spacing: 0.5px;">
+                                                    {{ field.label }}
+                                                </label>
+                                                <small class="text-muted small-text">Permisos globales en Aviara</small>
+                                            </div>
+                                            <div class="form-check form-switch m-0">
+                                                <input class="form-check-input custom-switch" type="checkbox" name="{{ field.name }}" 
+                                                       id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small text-uppercase" style="color: #4a5568; font-size: 0.8rem; letter-spacing: 0.5px;">
+                                            {{ field.label }}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1 fw-medium">⚠️ {{ field.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-5 pt-3 d-flex gap-3 border-top border-light">
+                                <button type="submit" class="btn text-white px-5 py-2.5 shadow-sm save-btn" 
+                                        style="background-color: #630E20; border-radius: 10px; font-weight: 600; transition: all 0.2s;">
+                                    💾 Guardar Cambios
+                                </button>
+                                <a href="{% url 'lista_usuarios' %}" class="btn btn-light px-4 py-2.5 cancel-btn" 
+                                   style="border-radius: 10px; font-weight: 600; border: 1px solid #cbd5e1; color: #64748b;">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm text-white text-center p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" 
+                     style="background: linear-gradient(135deg, #630E20 0%, #3d0712 100%); border-radius: 16px;">
+                    
+                    <div class="position-absolute opacity-10 end-0 bottom-0" style="font-size: 12rem; transform: translate(20px, 40px); pointer-events: none;">🌾</div>
+
+                    <div class="position-relative z-index-10">
+                        <div class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm fw-bold" 
+                             style="width: 72px; height: 72px; color: #630E20; font-size: 1.8rem;">
+                            {{ usuario.username|first|upper }}
+                        </div>
+                        
+                        <h4 class="fw-bold mb-1 tracking-tight">{{ usuario.username }}</h4>
+                        <p class="opacity-75 small mb-3">{{ usuario.email|default:"Sin correo asignado" }}</p>
+                        
+                        <div class="py-1.5 px-4 mb-4 d-inline-block mx-auto fw-bold uppercase small" 
+                             style="border-radius: 50px; font-size: 0.75rem; letter-spacing: 0.5px; background-color: {% if form.instance.is_active %}#e6f6ee{% else %}#fdeeed{% endif %}; color: {% if form.instance.is_active %}#15803d{% else %}#b91c1c{% endif %};">
+                            ● {% if form.instance.is_active %}CUENTA ACTIVA{% else %}CUENTA INHABILITADA{% endif %}
+                        </div>
+                        
+                        <hr class="opacity-10 my-4">
+
+                        <div class="px-3">
+                            <p class="small text-uppercase fw-bold opacity-50 mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Auditoría de Seguridad</p>
+                            <p class="small text-muted mb-0 lh-base text-start text-center-custom" style="font-size: 0.85rem; color: #fbcfe8 !important; opacity: 0.8;">
+                                Alterar los roles o el estado activo de un colaborador modificará inmediatamente sus permisos en los módulos de inventarios y ventas de la granja.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ajustes generales del contenedor */
+    .max-width-container {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* Estilización forzada de los inputs dinámicos de Django */
+    input[type="text"], input[type="email"], input[type="password"], select {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #334155;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    input:focus, select:focus {
+        border-color: #630E20;
+        box-shadow: 0 0 0 3px rgba(99, 14, 32, 0.12);
+        outline: none;
+    }
+
+    /* Caja de switches */
+    .system-switch-box {
+        background-color: #f8fafc; 
+        border-radius: 12px; 
+        border: 1px solid #e2e8f0;
+    }
+
+    .small-text {
+        font-size: 0.8rem;
+    }
+
+    /* Estilos de los switches */
+    .custom-switch {
+        width: 42px !important; 
+        height: 22px !important; 
+        cursor: pointer;
+    }
+    .form-check-input:checked {
+        background-color: #630E20;
+        border-color: #630E20;
+    }
+
+    /* Efectos de botones */
+    .back-btn:hover {
+        background-color: #f8fafc !important;
+        color: #630E20 !important;
+        transform: translateY(-1px);
+    }
+
+    .save-btn:hover {
+        background-color: #4a0a18 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 14, 32, 0.2);
+    }
+
+    .cancel-btn:hover {
+        background-color: #e2e8f0;
+        color: #334155 !important;
+    }
+
+    /* Animación de entrada suave del formulario */
+    .row {
+        animation: formFadeIn 0.4s ease-out;
+    }
+
+    @keyframes formFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 576px) {
+        .text-center-custom {
+            text-align: center !important;
+        }
+    }
+</style>
+{% endblock %}

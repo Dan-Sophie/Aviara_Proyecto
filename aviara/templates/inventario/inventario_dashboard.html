@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4" style="background-color: #f5f6fa; min-height: 100vh;">
+    
+    <!-- Encabezado del Dashboard (Color Grafito Industrial #2F3640) -->
+    <header class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold" style="color: #2F3640; font-size: 3rem; letter-spacing: -1px; margin-bottom: 5px; font-weight: 800;">
+                Control de Existencias
+            </h1>
+            <p class="text-muted fw-bold" style="font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin: 0;">
+                Aviara | Centro de Trazabilidad e Inteligencia Operativa
+            </p>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <!-- Botón de Reporte Inteligente con WeasyPrint -->
+            <a href="{% url 'datos_reporte_inventario' %}" target="_blank" class="btn text-white px-3 shadow-sm d-flex align-items-center" 
+               style="background-color: #2F3640; border-radius: 10px; font-weight: 600; height: 42px; border: none; transition: background 0.2s;">
+                <i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar Reporte Inteligente
+            </a>
+            
+            <a href="{% url 'home' %}" class="btn btn-white border shadow-sm d-flex align-items-center px-3" 
+               style="border-radius: 10px; font-weight: 600; height: 42px; color: #495057; background-color: #ffffff;">
+                <i class="bi bi-grid-1x2-fill me-2"></i> Panel Principal
+            </a>
+        </div>
+    </header>
+
+    <!-- CRITERIO 2: Alerta Crítica del Sistema (Global Banner) -->
+    {% if lotes_criticos_conteo > 0 %}
+        <div class="alert border-0 shadow-sm mb-4 text-dark d-flex align-items-center justify-content-between p-3" 
+             style="border-radius: 14px; background-color: #FFF3CD; border-left: 6px solid #FFC107 !important;">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-3 me-3"></i>
+                <div>
+                    <strong style="font-size: 1.1rem;">¡Atención Administrativa!</strong>
+                    <p class="m-0 text-secondary" style="font-size: 0.9rem;">El sistema detecta <strong>{{ lotes_criticos_conteo }} lote(s)</strong> operando por debajo del stock mínimo de seguridad permitido.</p>
+                </div>
+            </div>
+            <span class="badge bg-warning text-dark px-3 py-2 fw-bold" style="border-radius: 8px;">Revisión Requerida</span>
+        </div>
+    {% endif %}
+
+    <!-- Tarjetas de Indicadores Clave (KPIs) -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background-color: #ffffff;">
+                <small class="text-uppercase fw-bold text-muted" style="letter-spacing: 0.5px; font-size: 0.75rem;">Capacidad Física en Stock</small>
+                <div class="d-flex align-items-baseline gap-2 mt-2">
+                    <span class="fs-1 fw-bold" style="color: #2F3640;">{{ total_stock_fisico }}</span>
+                    <span class="text-muted small fw-medium">unidades totales</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background-color: #ffffff;">
+                <small class="text-uppercase fw-bold text-muted" style="letter-spacing: 0.5px; font-size: 0.75rem;">Lotes en Alerta Mínima</small>
+                <div class="d-flex align-items-baseline gap-2 mt-2">
+                    <span class="fs-1 fw-bold {% if lotes_criticos_conteo > 0 %}text-danger{% else %}text-success{% endif %}">
+                        {{ lotes_criticos_conteo }}
+                    </span>
+                    <span class="text-muted small fw-medium">requieren reabastecimiento</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Filtros y Herramientas (CRITERIO 4: Filtrado por Calidad) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white shadow-sm" style="border-radius: 14px;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-filter-left text-secondary fs-4"></i>
+            <span class="fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;">Optimizar Ventas por Calidad:</span>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="?" class="btn btn-sm {% if not filtro_actual %}btn-dark-custom{% else %}btn-outline-dark-custom{% endif %} px-3 fw-bold">Todos</a>
+            <a href="?calidad=ACEPTABLE" class="btn btn-sm {% if filtro_actual == 'ACEPTABLE' %}btn-dark-custom{% else %}btn-outline-dark-custom{% endif %} px-3 fw-bold">Aceptable</a>
+            <a href="?calidad=MEDIO" class="btn btn-sm {% if filtro_actual == 'MEDIO' %}btn-dark-custom{% else %}btn-outline-dark-custom{% endif %} px-3 fw-bold">Media Prioridad</a>
+            <a href="?calidad=DAÑADO" class="btn btn-sm {% if filtro_actual == 'DAÑADO' %}btn-dark-custom{% else %}btn-outline-dark-custom{% endif %} px-3 fw-bold">Dañados</a>
+        </div>
+    </div>
+
+    <!-- Tabla Maestra de Lotes (CRITERIO 1: Visualización de Stock y Estados) -->
+    <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead style="background-color: #F8F9FA; border-bottom: 2px solid #ECEFF1;">
+                    <tr class="text-uppercase small fw-bold text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">
+                        <th class="p-4 border-0">Código Lote</th>
+                        <th class="p-4 border-0">Producto Asociado</th>
+                        <th class="p-4 border-0">Vencimiento</th>
+                        <th class="p-4 border-0 text-center">Clasificación de Calidad</th>
+                        <th class="p-4 border-0 text-center">Stock Físico Actual</th>
+                        <th class="p-4 border-0 text-center">Estado Crítico</th>
+                        <th class="p-4 border-0 text-center">Auditoría / Trazabilidad</th>
+                    </tr>
+                </thead>
+                <tbody style="font-size: 0.95rem;">
+                    {% for lote in lotes %}
+                    <tr {% if lote.cantidad_actual < lote.stock_minimo %}style="background-color: rgba(220, 53, 69, 0.02);"{% endif %}>
+                        <td class="p-4 fw-bold text-dark"># {{ lote.codigo_lote }}</td>
+                        <td class="p-4">
+                            <span class="fw-semibold text-secondary">{{ lote.producto.nombre }}</span>
+                        </td>
+                        
+                        <!-- Destacado de Fecha de Vencimiento -->
+                        <td class="p-4">
+                            <span class="text-dark fw-medium">
+                                <i class="bi bi-calendar3 me-1 text-muted"></i> {{ lote.fecha_vencimiento|date:"d/m/Y" }}
+                            </span>
+                        </td>
+                        
+                        <!-- Estado de Calidad -->
+                        <td class="p-4 text-center">
+                            {% if lote.estado_calidad == 'ACEPTABLE' %}
+                                <span class="badge px-3 py-2 text-success bg-success-subtle" style="border: 1px solid rgba(25, 135, 84, 0.2); border-radius: 8px;">Aceptable</span>
+                            {% elif lote.estado_calidad == 'MEDIO' %}
+                                <span class="badge px-3 py-2 text-warning bg-warning-subtle" style="border: 1px solid rgba(255, 193, 7, 0.2); border-radius: 8px;">Medio (Venta Rápida)</span>
+                            {% else %}
+                                <span class="badge px-3 py-2 text-danger bg-danger-subtle" style="border: 1px solid rgba(220, 53, 69, 0.2); border-radius: 8px;">Dañado</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Cantidades Numéricas -->
+                        <td class="p-4 text-center fw-bold" style="color: #2F3640; font-size: 1.05rem;">
+                            {{ lote.cantidad_actual }} <span class="text-muted fw-normal small">unds</span>
+                        </td>
+                        
+                        <!-- Columna de Semáforo de Riesgo (Criterio 2) -->
+                        <td class="p-4 text-center">
+                            {% if lote.cantidad_actual < lote.stock_minimo %}
+                                <span class="text-danger small fw-bold text-uppercase d-flex align-items-center justify-content-center gap-1">
+                                    <span class="spinner-grow spinner-grow-sm text-danger" role="status" style="width: 8px; height: 8px;"></span>
+                                    Bajo el Mínimo ({{ lote.stock_minimo }})
+                                </span>
+                            {% else %}
+                                <span class="text-success small fw-semibold text-uppercase">
+                                    <i class="bi bi-shield-fill-check"></i> Seguro
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- CRITERIO 3: Consulta de Trazabilidad (Detalle histórico vía Modal) -->
+                        <td class="p-4 text-center">
+                            <button type="button" class="btn btn-sm btn-light border px-3 fw-bold btn-trace-hover" 
+                                    style="border-radius: 8px; color: #495057;"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalTrazabilidad{{ lote.id }}">
+                                <i class="bi bi-journal-text me-1" style="color: #2F3640;"></i> Historial
+                            </button>
+
+                            <!-- MODAL DE TRAZABILIDAD COMPLETO -->
+                            <div class="modal fade" id="modalTrazabilidad{{ lote.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content border-0 shadow" style="border-radius: 18px; text-align: left;">
+                                        <div class="modal-header border-0 py-3 text-white" style="border-radius: 18px 18px 0 0; background-color: #2F3640;">
+                                            <h5 class="fw-bold m-0" style="font-size: 1.2rem;">
+                                                <i class="bi bi-search me-2"></i>Historial de Trazabilidad: Lote {{ lote.codigo_lote }}
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-6 col-md-3">
+                                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Cantidad Inicial</small>
+                                                    <span class="fs-5 fw-bold text-dark">{{ lote.cantidad_inicial }} unds</span>
+                                                </div>
+                                                <div class="col-6 col-md-3">
+                                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Inventario Actual</small>
+                                                    <span class="fs-5 fw-bold" style="color: #2F3640;">{{ lote.cantidad_actual }} unds</span>
+                                                </div>
+                                                <div class="col-6 col-md-3">
+                                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Fecha Registro</small>
+                                                    <span class="fw-semibold text-dark d-block mt-1" style="font-size: 0.9rem;">{{ lote.fecha_registro_sistema|date:"d/m/Y" }}</span>
+                                                </div>
+                                                <div class="col-6 col-md-3">
+                                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Estado de Calidad</small>
+                                                    <span class="fw-semibold text-dark d-block mt-1" style="font-size: 0.9rem;">{{ lote.estado_calidad }}</span>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-2">Registros de Origen (Producción)</h6>
+                                            <p class="text-muted small mb-0">Este lote fue dado de alta automáticamente a través del módulo de producción por el sistema central de registros.</p>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="button" class="btn text-white w-100 fw-bold" data-bs-dismiss="modal" 
+                                                    style="border-radius: 10px; background-color: #2F3640;">Entendido</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="p-5 text-center">
+                            <i class="bi bi-box-seam text-muted opacity-25 d-block mb-2" style="font-size: 3rem;"></i>
+                            <p class="text-muted fw-bold">No hay lotes vigentes registrados en el inventario.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Efecto hover en la tabla */
+    .table-hover tbody tr:hover { background-color: rgba(47, 54, 64, 0.01) !important; }
+    
+    /* Variaciones de Bootstrap Badges */
+    .bg-success-subtle { background-color: #E8F5E9; color: #1E4620; }
+    .bg-warning-subtle { background-color: #FFFDE7; color: #5D4037; }
+    .bg-danger-subtle { background-color: #FFEBEE; color: #721C24; }
+
+    /* Estilos personalizados para los botones de filtrado con el color del módulo */
+    .btn-dark-custom {
+        background-color: #2F3640 !important;
+        color: #ffffff !important;
+        border: 1px solid #2F3640 !important;
+        border-radius: 6px;
+    }
+    .btn-outline-dark-custom {
+        background-color: transparent !important;
+        color: #2F3640 !important;
+        border: 1px solid #2F3640 !important;
+        border-radius: 6px;
+    }
+    .btn-outline-dark-custom:hover {
+        background-color: #2F3640 !important;
+        color: #ffffff !important;
+    }
+    .header-btn:hover {
+        background-color: #1e2329 !important;
+    }
+    .btn-trace-hover:hover {
+        background-color: #F1F2F6 !important;
+    }
+</style>
+{% endblock %}

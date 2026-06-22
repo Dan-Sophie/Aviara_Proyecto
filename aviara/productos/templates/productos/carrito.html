@@ -1,0 +1,344 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrito — Aviara{% endblock %}
+
+{% block extra_css %}
+<style>
+  .carrito-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+  .carrito-titulo { font-size: 1.8rem; font-weight: 700; color: #630E20; margin-bottom: 0.3rem; }
+  .carrito-sub { color: #999; font-size: 0.88rem; margin-bottom: 2rem; }
+
+  /* Tabla */
+  .carrito-tabla { width: 100%; border-collapse: collapse; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .carrito-tabla thead { background: #630E20; color: #fff; }
+  .carrito-tabla th { padding: 14px 16px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: left; }
+  .carrito-tabla td { padding: 14px 16px; border-bottom: 1px solid #f0e8e8; vertical-align: middle; font-size: 0.9rem; color: #333; }
+  .carrito-tabla tr:last-child td { border-bottom: none; }
+  .carrito-tabla tr:hover td { background: #fdf8f8; }
+
+  .prod-img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; }
+  .prod-emoji { width: 52px; height: 52px; border-radius: 10px; background: #f0e8e8; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+  .prod-nombre { font-weight: 600; color: #1A1A1A; }
+  .prod-pres { font-size: 0.75rem; color: #F57C00; font-weight: 600; margin-top: 2px; }
+
+  /* Cantidad */
+  .qty-control { display: flex; align-items: center; gap: 8px; }
+  .qty-control button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #630E20; background: transparent; color: #630E20; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .qty-control button:hover { background: #630E20; color: #fff; }
+  .qty-control input { width: 48px; text-align: center; border: 2px solid #eee; border-radius: 8px; padding: 4px; font-size: 0.9rem; font-weight: 600; }
+  .qty-control input:focus { outline: none; border-color: #630E20; }
+
+  .precio-item { font-weight: 600; color: #630E20; white-space: nowrap; }
+  .btn-eliminar { background: transparent; border: none; color: #ccc; font-size: 1.1rem; cursor: pointer; transition: color 0.15s; }
+  .btn-eliminar:hover { color: #e53e3e; }
+
+  /* Resumen */
+  .carrito-resumen { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); padding: 1.5rem; margin-top: 1.5rem; }
+  .resumen-fila { display: flex; justify-content: space-between; font-size: 0.9rem; color: #666; margin-bottom: 8px; }
+  .resumen-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #630E20; border-top: 2px solid #f0e8e8; padding-top: 12px; margin-top: 8px; }
+
+  /* Formulario pago */
+  .pago-form { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); padding: 1.5rem; margin-top: 1.5rem; }
+  .pago-form h3 { font-size: 1rem; font-weight: 700; color: #630E20; margin-bottom: 1rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .form-group input, .form-group select { width: 100%; border: 2px solid #eee; border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus { border-color: #630E20; }
+
+  .btn-pagar { width: 100%; padding: 14px; border-radius: 50px; border: none; background: #630E20; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: inherit; margin-top: 0.5rem; }
+  .btn-pagar:hover { background: #4a0a18; }
+  .btn-seguir { display: inline-block; margin-top: 1rem; color: #630E20; font-size: 0.85rem; text-decoration: none; font-weight: 600; }
+  .btn-seguir:hover { text-decoration: underline; }
+
+  .carrito-vacio { text-align: center; padding: 4rem 2rem; color: #999; }
+  .carrito-vacio .icono { font-size: 4rem; margin-bottom: 1rem; }
+  .error-msg { background: #fff5f5; border: 2px solid #fc8181; border-radius: 10px; color: #c53030; padding: 10px 14px; font-size: 0.88rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="carrito-wrap">
+
+  <nav style="margin-bottom:1rem;font-size:0.83rem;color:#999;">
+    <a href="{% url 'landing' %}" style="color:#630E20;text-decoration:none;font-weight:600;">Inicio</a>
+    <span style="margin:0 6px;">›</span>
+    <a href="{% url 'catalogo' %}" style="color:#630E20;text-decoration:none;font-weight:600;">Catálogo</a>
+    <span style="margin:0 6px;">›</span>
+    <span>Carrito</span>
+  </nav>
+
+  <div class="carrito-titulo">🛒 Mi carrito</div>
+  <div class="carrito-sub">Revisa tus productos antes de confirmar el pedido</div>
+
+  {% if error %}
+    <div class="error-msg">⚠️ {{ error }}</div>
+  {% endif %}
+
+  {% if items %}
+
+    <!-- Tabla de ítems -->
+    <table class="carrito-tabla" id="tabla-carrito">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio unit.</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr id="fila-{{ item.id }}">
+          <td>
+            <div style="display:flex;align-items:center;gap:12px;">
+              {% if item.producto.imagen %}
+                <img src="{{ item.producto.imagen.url }}" class="prod-img" alt="{{ item.producto.nombre }}">
+              {% else %}
+                <div class="prod-emoji">{% if 'huevo' in item.producto.nombre|lower %}🥚{% else %}🌿{% endif %}</div>
+              {% endif %}
+              <div>
+                <div class="prod-nombre">{{ item.producto.nombre }}</div>
+                {% if item.presentacion %}
+                  <div class="prod-pres">
+                    {% if item.presentacion == 'x6' %}Media docena (x6)
+                    {% elif item.presentacion == 'x15' %}Media cubeta (x15)
+                    {% elif item.presentacion == 'x30' %}Cubeta (x30)
+                    {% else %}{{ item.presentacion }}{% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td class="precio-item">${{ item.precio_unitario|floatformat:0 }}</td>
+          <td>
+            <div class="qty-control">
+              <button onclick="cambiarCantidad({{ item.id }}, -1)">−</button>
+              <input type="number" id="qty-{{ item.id }}" value="{{ item.cantidad }}"
+                     min="1" max="{{ item.producto.stock }}"
+                     onchange="setCantidad({{ item.id }}, this.value)">
+              <button onclick="cambiarCantidad({{ item.id }}, 1)">+</button>
+            </div>
+          </td>
+          <td class="precio-item" id="sub-{{ item.id }}">${{ item.subtotal|floatformat:0 }}</td>
+          <td>
+            <button class="btn-eliminar" onclick="eliminarItem({{ item.id }})" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Resumen -->
+    <div class="carrito-resumen">
+      <div class="resumen-fila"><span>Productos</span><span id="cant-productos">{{ items|length }}</span></div>
+      <div class="resumen-total"><span>Total</span><span id="total-carrito">${{ total|floatformat:0 }}</span></div>
+    </div>
+
+    <!-- Formulario de pago -->
+    {% if mostrar_pago %}
+    <div class="pago-form" id="form-pago">
+      <h3>📦 Datos de entrega y pago</h3>
+      <div id="error-form" style="display:none;" class="error-msg"></div>
+      <form id="formulario-pago" method="POST" action="{% url 'confirmar_pedido' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Dirección de entrega *</label>
+          <input type="text" id="campo-direccion" name="direccion"
+                 placeholder="Ej: Calle 10 #25-30, Barrio El Poblado" required>
+          <small id="err-direccion" style="color:#e53e3e;font-size:0.78rem;display:none;">La dirección debe tener al menos 10 caracteres.</small>
+        </div>
+        <div class="form-group">
+          <label>Teléfono de contacto *</label>
+          <input type="text" id="campo-telefono" name="telefono"
+                 placeholder="Ej: 3001234567" maxlength="10" required>
+          <small id="err-telefono" style="color:#e53e3e;font-size:0.78rem;display:none;">Solo números, mínimo 7 dígitos.</small>
+        </div>
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select name="metodo_pago" id="campo-metodo" onchange="mostrarSimulacion(this.value)">
+            <option value="efectivo">Efectivo contra entrega</option>
+            <option value="transferencia">Transferencia bancaria</option>
+            <option value="nequi">Nequi</option>
+            <option value="daviplata">Daviplata</option>
+          </select>
+        </div>
+
+        <!-- Simulación Nequi / Daviplata -->
+        <div id="sim-celular" style="display:none;">
+          <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;">
+            <div style="font-size:0.82rem;font-weight:700;color:#166534;margin-bottom:8px;">📱 Pago móvil simulado</div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color:#166534;">Número celular registrado</label>
+              <input type="text" id="sim-numero" placeholder="Ej: 3001234567" maxlength="10" style="border-color:#86efac;">
+            </div>
+            <small style="color:#166534;font-size:0.75rem;">⚠️ Esto es una simulación — no se realizará ningún cobro real.</small>
+          </div>
+        </div>
+
+        <!-- Simulación transferencia bancaria -->
+        <div id="sim-transferencia" style="display:none;">
+          <div style="background:#eff6ff;border:2px solid #93c5fd;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;">
+            <div style="font-size:0.82rem;font-weight:700;color:#1e40af;margin-bottom:8px;">🏦 Transferencia bancaria simulada</div>
+            <div style="font-size:0.85rem;color:#1e40af;line-height:1.9;">
+              <strong>Banco:</strong> Bancolombia<br>
+              <strong>Tipo:</strong> Cuenta de ahorros<br>
+              <strong>Número:</strong> 123-456789-00<br>
+              <strong>Titular:</strong> Aviara S.A.S<br>
+              <strong>NIT:</strong> 900.123.456-7
+            </div>
+            <small style="color:#1e40af;font-size:0.75rem;margin-top:8px;display:block;">⚠️ Esto es una simulación — no se realizará ningún cobro real.</small>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-pagar">✅ Confirmar pedido</button>
+      </form>
+    </div>
+    {% else %}
+    <div style="margin-top:1.2rem;display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="{% url 'catalogo' %}" class="btn-seguir">← Seguir comprando</a>
+      <button onclick="mostrarFormPago()"
+              style="flex:1;padding:14px;border-radius:50px;border:none;background:#630E20;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;min-width:200px;">
+        Proceder al pago →
+      </button>
+    </div>
+    {% endif %}
+
+  {% else %}
+    <div class="carrito-vacio">
+      <div class="icono">🛒</div>
+      <p style="font-size:1.1rem;font-weight:600;color:#666;">Tu carrito está vacío</p>
+      <a href="{% url 'catalogo' %}" style="display:inline-block;margin-top:1rem;padding:12px 28px;border-radius:50px;background:#630E20;color:#fff;text-decoration:none;font-weight:600;">
+        Ver catálogo
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const CSRF = '{{ csrf_token }}';
+
+  function formatPesos(n) {
+    return '$' + Math.round(n).toLocaleString('es-CO');
+  }
+
+  function actualizarResumen(data) {
+    if (data.total_carrito !== undefined) {
+      document.getElementById('total-carrito').textContent = formatPesos(data.total_carrito);
+    }
+    if (data.cant_items !== undefined) {
+      const el = document.getElementById('cant-productos');
+      if (el) el.textContent = data.cant_items;
+      // Actualizar badge en navbar si existe
+      const badge = document.getElementById('carrito-badge');
+      if (badge) badge.textContent = data.cant_items;
+    }
+  }
+
+  async function cambiarCantidad(itemId, delta) {
+    const input = document.getElementById('qty-' + itemId);
+    const nueva = Math.max(1, parseInt(input.value) + delta);
+    input.value = nueva;
+    await setCantidad(itemId, nueva);
+  }
+
+  async function setCantidad(itemId, cantidad) {
+    cantidad = parseInt(cantidad);
+    if (isNaN(cantidad) || cantidad < 1) { cantidad = 1; }
+
+    const res  = await fetch(`/productos/carrito/actualizar/${itemId}/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+      body: JSON.stringify({ cantidad }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) { alert(data.error || 'Error al actualizar'); return; }
+
+    if (data.accion === 'eliminado') {
+      document.getElementById('fila-' + itemId)?.remove();
+    } else {
+      document.getElementById('qty-' + itemId).value = cantidad;
+      document.getElementById('sub-' + itemId).textContent = formatPesos(data.subtotal);
+    }
+    actualizarResumen(data);
+
+    if (data.cant_items === 0) location.reload();
+  }
+
+  async function eliminarItem(itemId) {
+    const res  = await fetch(`/productos/carrito/eliminar/${itemId}/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF },
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('fila-' + itemId)?.remove();
+      actualizarResumen(data);
+      if (data.cant_items === 0) location.reload();
+    }
+  }
+
+  function mostrarFormPago() {
+    window.location.href = "{% url 'confirmar_pedido' %}";
+  }
+
+  // ── Simulación de método de pago ──
+  function mostrarSimulacion(metodo) {
+    document.getElementById('sim-celular').style.display     = (metodo === 'nequi' || metodo === 'daviplata') ? 'block' : 'none';
+    document.getElementById('sim-transferencia').style.display = metodo === 'transferencia' ? 'block' : 'none';
+  }
+
+  // ── Validación del formulario ──
+  function validarFormulario(e) {
+    e.preventDefault();
+    let valido = true;
+
+    const dir    = document.getElementById('campo-direccion');
+    const tel    = document.getElementById('campo-telefono');
+    const errDir = document.getElementById('err-direccion');
+    const errTel = document.getElementById('err-telefono');
+
+    // Validar dirección — mínimo 10 caracteres
+    if (!dir || dir.value.trim().length < 10) {
+      if (errDir) errDir.style.display = 'block';
+      if (dir) dir.style.borderColor = '#e53e3e';
+      valido = false;
+    } else {
+      if (errDir) errDir.style.display = 'none';
+      if (dir) dir.style.borderColor = '#eee';
+    }
+
+    // Validar teléfono — solo números, mínimo 7 dígitos
+    const soloNumeros = /^\d{7,10}$/.test(tel ? tel.value.trim() : '');
+    if (!tel || !soloNumeros) {
+      if (errTel) errTel.style.display = 'block';
+      if (tel) tel.style.borderColor = '#e53e3e';
+      valido = false;
+    } else {
+      if (errTel) errTel.style.display = 'none';
+      if (tel) tel.style.borderColor = '#eee';
+    }
+
+    if (valido) {
+      document.getElementById('formulario-pago').submit();
+    }
+    return false;
+  }
+
+  // Bloquear letras en teléfono
+  document.addEventListener('DOMContentLoaded', () => {
+    const tel = document.getElementById('campo-telefono');
+    if (tel) {
+      tel.addEventListener('input', () => {
+        tel.value = tel.value.replace(/[^0-9]/g, '');
+      });
+    }
+  });
+</script>
+{% endblock %}

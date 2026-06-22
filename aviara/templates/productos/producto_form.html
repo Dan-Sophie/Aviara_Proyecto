@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4 p-md-5" style="background-color: #f4f6f5; min-height: 100vh;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="card border-0 shadow-sm mt-2" style="border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+                
+                <div style="height: 5px; background-color: #2C3E2B;"></div>
+
+                <div class="card-body p-4 p-md-5">
+                    
+                    <header class="mb-5 pb-4 border-bottom" style="border-color: #e2e8f0 !important;">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="d-flex align-items-center justify-content-center text-white shadow-sm" 
+                                 style="background-color: #2C3E2B; width: 48px; height: 48px; border-radius: 10px; font-size: 1.3rem;">
+                                {% if producto %}<i class="bi bi-pencil-square"></i>{% else %}<i class="bi bi-box-seam-fill"></i>{% endif %}
+                            </div>
+                            <div>
+                                <h2 class="fw-bold m-0 tracking-tight" style="color: #2C3E2B; font-size: 2rem;">
+                                    {% if producto %}Modificar Producto{% else %}Nuevo Producto{% endif %}
+                                </h2>
+                                <p class="fw-semibold text-uppercase m-0 mt-0.5" style="color: #64748b; font-size: 0.75rem; letter-spacing: 1px;">
+                                    Catálogo Operativo e Inventarios Base
+                                </p>
+                            </div>
+                        </div>
+                        <p class="m-0 text-muted mt-3" style="font-size: 0.95rem; line-height: 1.5;">
+                            Asegure el correcto ingreso de precios base, categorías e identificadores para mantener la sincronización con los módulos de ventas y mermas de la granja Aviara.
+                        </p>
+                    </header>
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="django-form-fields row g-4">
+                            {% for field in form %}
+                                <div class="{% if field.name == 'descripcion' or field.name == 'activo' or field.name == 'estado' %}col-12{% else %}col-md-6{% endif %}">
+                                    
+                                    {% if field.name == 'activo' or field.name == 'estado' %}
+                                        <div class="p-3 d-flex align-items-center gap-3 custom-checkbox-card">
+                                            <div class="form-check m-0 d-flex align-items-center">
+                                                {{ field }}
+                                                <label class="form-check-label fw-semibold text-uppercase ms-2.5" for="{{ field.id_for_label }}" style="color: #334155; font-size: 0.8rem; letter-spacing: 0.5px; cursor: pointer;">
+                                                    {{ field.label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <label class="form-label fw-semibold small text-uppercase mb-2" style="color: #475569; font-size: 0.8rem; letter-spacing: 0.5px;">
+                                            {{ field.label }}
+                                        </label>
+                                        
+                                        <div class="input-group-container">
+                                            {{ field }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if field.help_text %}
+                                        <div class="form-text text-muted small mt-1" style="font-size: 0.8rem;">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1.5 fw-medium d-flex align-items-center gap-1" style="font-size: 0.85rem;">
+                                            ⚠️ {{ field.errors|striptags }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="my-5 border-top" style="border-color: #e2e8f0 !important;"></div>
+
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{% url 'lista_productos' %}" class="btn btn-light px-4 py-2 cancel-btn" 
+                               style="border-radius: 10px; font-weight: 600; font-size: 0.95rem; border: 1px solid #cbd5e1; color: #64748b;">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn text-white px-5 py-2 shadow-sm d-flex align-items-center gap-2 save-btn" 
+                                    style="background-color: #2C3E2B; border-radius: 10px; font-weight: 600; font-size: 0.95rem; border: none; transition: all 0.2s;">
+                                {% if producto %}
+                                     Guardar Cambios
+                                {% else %}
+                                     Registrar Producto
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Control unificado de los elementos de entrada dinámicos de Django */
+    .django-form-fields input[type="text"], 
+    .django-form-fields input[type="number"], 
+    .django-form-fields input[type="email"], 
+    .django-form-fields select, 
+    .django-form-fields textarea {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px !important;
+        background-color: #ffffff;
+        color: #334155;
+        font-size: 0.95rem;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .django-form-fields textarea {
+        resize: none;
+        height: 110px;
+    }
+
+    /* Caja especial para el check de activo */
+    .custom-checkbox-card {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+    /* Input checkbox nativo estilizado */
+    .django-form-fields input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        border-radius: 4px !important;
+        border: 1px solid #cbd5e1;
+        transition: all 0.15s ease-in-out;
+    }
+
+    /* Anillo de enfoque y cambio a verde al interactuar */
+    .django-form-fields input:focus, 
+    .django-form-fields select:focus, 
+    .django-form-fields textarea:focus {
+        border-color: #2C3E2B;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(44, 62, 43, 0.12);
+        background-color: #ffffff;
+    }
+
+    .django-form-fields input[type="checkbox"]:checked {
+        background-color: #2C3E2B;
+        border-color: #2C3E2B;
+    }
+
+    /* Estilos dinámicos para botones de acción */
+    .save-btn:hover {
+        background-color: #1e2b1e !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44, 62, 43, 0.2);
+    }
+
+    .cancel-btn:hover {
+        background-color: #e2e8f0;
+        color: #334155 !important;
+    }
+
+    /* Animación suave al renderizar la tarjeta */
+    .card {
+        animation: formFadeIn 0.4s ease-out;
+    }
+
+    @keyframes formFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 animate-fade-in">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'dashboard_operador' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i> Volver al Dashboard
+        </a>
+        <a href="{% url 'crear_merma' %}" class="btn text-white px-4 rounded-pill fw-bold" style="background-color: #B91C1C;">
+            <i class="fas fa-plus-circle me-2"></i> Reportar Pérdida
+        </a>
+    </div>
+
+    <div class="mb-4">
+        <h2 class="fw-black text-dark display-6 mb-1">Registro de Mermas</h2>
+        <p class="text-muted">Historial de pérdidas, roturas o ajustes de inventario.</p>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="text-uppercase" style="background-color: #FEE2E2; color: #991B1B; font-size: 0.75rem; letter-spacing: 1px;">
+                    <tr>
+                        <th class="ps-4 py-3">Lote / Galpón</th>
+                        <th>Cantidad</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Detalles</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for merma in mermas %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-bold d-block">{{ merma.lote.codigo_lote }}</span>
+                            <small class="text-muted">{{ merma.fecha_registro|date:"d M, Y" }}</small>
+                        </td>
+                        <td><span class="text-danger fw-bold">{{ merma.cantidad_perdida }} unds</span></td>
+                        <td><span class="badge bg-light text-dark border">{{ merma.get_motivo_display }}</span></td>
+                        <td>
+                            {% if merma.estado == 'PENDIENTE' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Pendiente</span>
+                            {% elif merma.estado == 'APROBADA' %}
+                                <span class="badge bg-success-subtle text-success-emphasis rounded-pill">Aplicada</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Rechazada</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end text-muted small">
+                            {{ merma.observaciones|truncatechars:30 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="fas fa-clipboard-check fa-3x opacity-25 mb-3"></i>
+                            <p>No se encontraron registros de mermas.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-4 { border-radius: 1.5rem !important; }
+    .fw-black { font-weight: 900; }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

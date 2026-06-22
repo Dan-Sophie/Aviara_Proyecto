@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido confirmado — Aviara{% endblock %}
+
+{% block content %}
+<div style="max-width:600px;margin:3rem auto;text-align:center;padding:2rem 1rem;">
+  <div style="font-size:4rem;margin-bottom:1rem;">✅</div>
+  <h1 style="font-size:1.8rem;font-weight:700;color:#630E20;margin-bottom:0.5rem;">¡Pedido confirmado!</h1>
+  <p style="color:#666;margin-bottom:2rem;">Tu pedido <strong>#{{ pedido.id }}</strong> fue registrado exitosamente. Nos comunicaremos contigo pronto.</p>
+
+  <div style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:1.5rem;text-align:left;margin-bottom:1.5rem;">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#630E20;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">Resumen del pedido</h3>
+    {% for detalle in pedido.detalles.all %}
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0e8e8;font-size:0.9rem;">
+      <span>
+        {{ detalle.producto.nombre }}
+        {% if detalle.presentacion %}
+          <span style="color:#F57C00;font-size:0.78rem;font-weight:600;">
+            ({% if detalle.presentacion == 'x6' %}x6{% elif detalle.presentacion == 'x15' %}x15{% elif detalle.presentacion == 'x30' %}x30{% else %}{{ detalle.presentacion }}{% endif %})
+          </span>
+        {% endif %}
+        × {{ detalle.cantidad }}
+      </span>
+      <span style="font-weight:600;color:#630E20;">${{ detalle.subtotal|floatformat:0 }}</span>
+    </div>
+    {% endfor %}
+    <div style="display:flex;justify-content:space-between;padding-top:12px;font-size:1.1rem;font-weight:700;color:#630E20;">
+      <span>Total</span>
+      <span>${{ pedido.total_pedido|floatformat:0 }}</span>
+    </div>
+  </div>
+
+  <div style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:1.5rem;text-align:left;margin-bottom:1.5rem;font-size:0.9rem;color:#666;">
+    <div style="margin-bottom:6px;"><strong>Dirección:</strong> {{ pedido.direccion_entrega }}</div>
+    <div style="margin-bottom:6px;"><strong>Método de pago:</strong> {{ pedido.metodo_pago }}</div>
+    <div><strong>Estado:</strong> <span style="color:#F57C00;font-weight:600;">{{ pedido.get_estado_pedido_display }}</span></div>
+  </div>
+
+  <a href="{% url 'catalogo' %}" style="display:inline-block;padding:12px 32px;border-radius:50px;background:#630E20;color:#fff;text-decoration:none;font-weight:700;">
+    Volver al catálogo
+  </a>
+</div>
+{% endblock %}
