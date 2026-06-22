@@ -105,3 +105,5 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 os.environ['PATH'] = r'C:\gtk3\bin' + os.path.pathsep + os.environ.get('PATH', '')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
