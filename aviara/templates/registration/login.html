@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh; padding: 30px 0;">
+    <div class="col-md-7 col-lg-5">
+        <div class="card border-0 shadow-lg p-3" style="border-radius: 25px; background-color: #ffffff;">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h1 class="fw-bold" style="color: #630E20; letter-spacing: -1.5px; margin-bottom: 2px; font-size: 2.2rem;">Bienvenido</h1>
+                    <p class="text-muted uppercase tracking-widest" style="font-size: 0.7rem; font-weight: 600;">INICIAR SESIÓN EN AVIARA</p>
+                </div>
+                
+                <form method="POST" id="loginForm">
+                    {% csrf_token %}
+                    
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger d-flex align-items-center" style="border-radius: 12px; font-size: 0.85rem;">
+                        <span class="me-2">⚠️</span>
+                        <div>Usuario o contraseña incorrectos.</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold mb-1" style="color: #333; font-size: 0.9rem; display: block;">
+                                Usuario
+                            </label>
+                            <input type="text" name="username" class="form-control aviara-input" 
+                                   placeholder="Ej: juan_perez" required>
+                        </div>
+
+                        <div class="col-12 mb-4">
+                            <label class="form-label fw-bold mb-1" style="color: #333; font-size: 0.9rem; display: block;">
+                                Contraseña
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="password" id="password_id" class="form-control aviara-input" 
+                                       placeholder="••••••••" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_id')" 
+                                        style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8f9fa; padding: 0 15px;">
+                                    <span id="icon-password_id" style="font-size: 0.9rem;">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn w-100 py-2 mt-2" 
+                            style="background-color: #630E20; color: white; border-radius: 12px; border: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease;">
+                        Ingresar al Sistema
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="mb-2">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none text-muted" style="font-size: 0.85rem;">¿Olvidaste tu contraseña?</a>
+                    </p>
+                    <p class="text-muted" style="font-size: 0.85rem;">¿Aún no tienes cuenta? 
+                        <a href="{% url 'registro' %}" class="text-decoration-none fw-bold" style="color: #630E20;">Regístrate aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <p class="text-center text-muted mt-4 uppercase tracking-widest" style="font-size: 0.6rem; opacity: 0.6;">
+            Aviara Software &copy; 2026
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Aplicamos el estilo "Premium" a los inputs del login
+        const inputs = document.querySelectorAll('.aviara-input');
+        inputs.forEach(el => {
+            el.style.backgroundColor = "#f8f9fa";
+            el.style.borderRadius = "12px";
+            el.style.border = "1px solid #e2e8f0";
+            el.style.padding = "10px 15px"; 
+            el.style.fontSize = "0.9rem";   
+            el.style.transition = "all 0.2s ease";
+
+            el.addEventListener('focus', () => {
+                el.style.borderColor = "#630E20";
+                el.style.backgroundColor = "#fff";
+                el.style.boxShadow = "0 0 0 3px rgba(99, 14, 32, 0.1)";
+            });
+            el.addEventListener('blur', () => {
+                el.style.borderColor = "#e2e8f0";
+                el.style.backgroundColor = "#f8f9fa";
+                el.style.boxShadow = "none";
+            });
+        });
+    });
+
+    function togglePassword(fieldId) {
+        const input = document.getElementById(fieldId);
+        const icon = document.getElementById('icon-' + fieldId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerText = "🔒";
+        } else {
+            input.type = "password";
+            icon.innerText = "👁️";
+        }
+    }
+</script>
+{% endblock %}

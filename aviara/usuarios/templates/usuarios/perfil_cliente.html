@@ -1,0 +1,277 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi perfil — Aviara{% endblock %}
+
+{% block extra_css %}
+<style>
+  .perfil-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+
+  /* Tarjeta de usuario */
+  .perfil-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .perfil-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: #630E20;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .perfil-info h2 { font-size: 1.4rem; font-weight: 700; color: #1A1A1A; margin: 0 0 4px; }
+  .perfil-info .email { font-size: 0.88rem; color: #999; }
+  .perfil-info .rol-badge {
+    display: inline-block;
+    background: #f0e8e8;
+    color: #630E20;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 12px;
+    border-radius: 50px;
+    margin-top: 6px;
+  }
+  .perfil-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    text-align: center;
+    background: #fdf8f8;
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+  }
+  .stat-box .val { font-size: 1.6rem; font-weight: 700; color: #630E20; }
+  .stat-box .lbl { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Acciones rápidas */
+  .acciones { display: flex; gap: 12px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-accion {
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-accion.primario { background: #630E20; color: #fff; }
+  .btn-accion.primario:hover { background: #4a0a18; color: #fff; }
+  .btn-accion.secundario { border: 2px solid #630E20; color: #630E20; background: transparent; }
+  .btn-accion.secundario:hover { background: #630E20; color: #fff; }
+
+  /* Sección historial */
+  .seccion-titulo { font-size: 1.1rem; font-weight: 700; color: #1A1A1A; margin-bottom: 1rem; }
+
+  /* Tarjeta de pedido */
+  .pedido-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .pedido-header {
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #f0e8e8;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pedido-header:hover { background: #fdf8f8; }
+  .pedido-num { font-weight: 700; color: #630E20; font-size: 0.9rem; }
+  .pedido-fecha { font-size: 0.8rem; color: #999; }
+  .pedido-total { font-weight: 700; color: #1A1A1A; }
+
+  .estado-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 12px;
+    border-radius: 50px;
+  }
+  .estado-PENDIENTE   { background: #fef9c3; color: #854d0e; }
+  .estado-PROCESANDO  { background: #dbeafe; color: #1e40af; }
+  .estado-CAMINO      { background: #e0f2fe; color: #0369a1; }
+  .estado-ENTREGADO   { background: #dcfce7; color: #166534; }
+  .estado-CANCELADO   { background: #fee2e2; color: #991b1b; }
+
+  .pedido-body { padding: 1rem 1.2rem; display: none; }
+  .pedido-body.abierto { display: block; }
+
+  .detalle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    padding: 6px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .detalle-row:last-child { border: none; }
+  .detalle-row .prod { color: #1A1A1A; font-weight: 500; }
+  .detalle-row .pres { color: #F57C00; font-size: 0.75rem; }
+  .detalle-row .sub  { color: #630E20; font-weight: 600; }
+
+  .pedido-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid #f0e8e8;
+    font-size: 0.82rem;
+    color: #666;
+  }
+  .pedido-meta span strong { color: #1A1A1A; }
+
+  .sin-pedidos {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="perfil-wrap">
+
+  <nav style="margin-bottom:1rem;font-size:0.83rem;color:#999;">
+    <a href="{% url 'landing' %}" style="color:#630E20;text-decoration:none;font-weight:600;">Inicio</a>
+    <span style="margin:0 6px;">›</span>
+    <span>Mi perfil</span>
+  </nav>
+
+  <!-- Tarjeta de usuario -->
+  <div class="perfil-card">
+    <div class="perfil-avatar">{{ usuario.first_name|first|upper|default:usuario.username|first|upper }}</div>
+    <div class="perfil-info">
+      <h2>{{ usuario.get_full_name|default:usuario.username }}</h2>
+      <div class="email">{{ usuario.email }}</div>
+      {% if usuario.rol %}<span class="rol-badge">{{ usuario.rol }}</span>{% endif %}
+    </div>
+    <div class="perfil-stats">
+      <div class="stat-box">
+        <div class="val">{{ pedidos.count }}</div>
+        <div class="lbl">Pedidos</div>
+      </div>
+      <div class="stat-box">
+        <div class="val">{{ pedidos|length }}</div>
+        <div class="lbl">Total histórico</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones rápidas -->
+  <div class="acciones">
+    <a href="{% url 'catalogo' %}" class="btn-accion primario">
+      <i class="bi bi-shop"></i> Ir al catálogo
+    </a>
+    <a href="{% url 'carrito' %}" class="btn-accion secundario">
+      <i class="bi bi-cart3"></i> Ver carrito
+    </a>
+    <a href="{% url 'logout' %}" class="btn-accion secundario">
+      <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </a>
+  </div>
+
+  <!-- Historial de pedidos -->
+  <div class="seccion-titulo">📋 Historial de pedidos</div>
+
+  {% if pedidos %}
+    {% for pedido in pedidos %}
+    <div class="pedido-card">
+      <div class="pedido-header" onclick="togglePedido({{ pedido.id }})">
+        <div>
+          <div class="pedido-num">Pedido #{{ pedido.id }}</div>
+          <div class="pedido-fecha">{{ pedido.fecha_pedido|date:"d M Y, H:i" }}</div>
+        </div>
+        <span class="estado-badge estado-{{ pedido.estado_pedido }}">
+          {{ pedido.get_estado_pedido_display }}
+        </span>
+        <div class="pedido-total">${{ pedido.total_pedido|floatformat:0 }}</div>
+        <i class="bi bi-chevron-down" id="chevron-{{ pedido.id }}" style="color:#999;transition:transform 0.2s;"></i>
+      </div>
+
+      <div class="pedido-body" id="body-{{ pedido.id }}">
+        {% for detalle in pedido.detalles.all %}
+        <div class="detalle-row">
+          <div>
+            <span class="prod">{{ detalle.producto.nombre }}</span>
+            {% if detalle.presentacion %}
+              <span class="pres">
+                — {% if detalle.presentacion == 'x6' %}Media docena{% elif detalle.presentacion == 'x15' %}Media cubeta{% elif detalle.presentacion == 'x30' %}Cubeta{% else %}{{ detalle.presentacion }}{% endif %}
+              </span>
+            {% endif %}
+          </div>
+          <div>
+            <span style="color:#999;font-size:0.8rem;">x{{ detalle.cantidad }} · ${{ detalle.precio_unitario_venta|floatformat:0 }}</span>
+            <span class="sub" style="margin-left:8px;">${{ detalle.subtotal|floatformat:0 }}</span>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="pedido-meta">
+          <span><strong>Dirección:</strong> {{ pedido.direccion_entrega }}</span>
+          <span><strong>Pago:</strong> {{ pedido.metodo_pago|capfirst }}</span>
+          {% if pedido.fecha_despacho %}
+            <span><strong>Despachado:</strong> {{ pedido.fecha_despacho|date:"d M Y" }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  {% else %}
+    <div class="sin-pedidos">
+      <i class="bi bi-bag-x" style="font-size:3rem;color:#f0e8e8;"></i>
+      <p style="font-size:1rem;font-weight:600;margin-top:1rem;">Aún no tienes pedidos</p>
+      <a href="{% url 'catalogo' %}" style="display:inline-block;margin-top:0.8rem;padding:10px 24px;border-radius:50px;background:#630E20;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;">
+        Ver catálogo
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function togglePedido(id) {
+    const body    = document.getElementById('body-' + id);
+    const chevron = document.getElementById('chevron-' + id);
+    body.classList.toggle('abierto');
+    chevron.style.transform = body.classList.contains('abierto') ? 'rotate(180deg)' : '';
+  }
+</script>
+{% endblock %}

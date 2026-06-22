@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Aviara{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vinotinto: '#630E20',
+                        naranja: '#F57C00',
+                        beige: '#F5F5DC',
+                        oscuro: '#1A1A1A',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #F5F5DC; }
+        .bg-vinotinto { background-color: #630E20; }
+        .text-vinotinto { color: #630E20; }
+        .btn-vinotinto { background-color: #630E20 !important; color: white !important; border: none; }
+        .btn-vinotinto:hover { background-color: #4a0a18 !important; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                
+                <div class="flex items-center">
+                    <a href="{% url 'landing' %}" class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold tracking-tighter text-vinotinto">AVIARA</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <div class="hidden md:block text-right">
+                            <p class="text-sm font-semibold text-gray-800 leading-none">
+                                {{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}
+                            </p>
+                            <span class="text-[10px] text-naranja font-bold uppercase tracking-wider">
+                                {% if user.is_superuser %}
+                                    Administrador General
+                                {% elif user.groups.all %}
+                                    {{ user.groups.all.0.name }}
+                                {% else %}
+                                    Usuario Estándar
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="flex items-center focus:outline-none" type="button" data-bs-toggle="dropdown">
+                                <div class="w-10 h-10 rounded-full bg-vinotinto flex items-center justify-center text-white font-bold border-2 border-naranja hover:scale-105 transition-transform">
+                                    {{ user.username|slice:":1"|upper }}
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+                                <li class="px-4 py-2 text-[11px] text-gray-500 uppercase font-bold tracking-widest">
+                                    ID: {{ user.username }}
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger flex items-center gap-2 py-2">
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-vinotinto btn-sm rounded-pill px-4 font-semibold">Ingresar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex flex-grow">
+        <main class="flex-grow">
+            {% block main_container %}
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    {% block content %}{% endblock %}
+                </div>
+            {% endblock %}
+        </main>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-[10px] uppercase tracking-widest font-bold">
+            &copy; 2026 Aviara - Sistema de Gestión de Granjas Avícolas
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    title: 'Notificación',
+                    text: "{{ message }}",
+                    icon: "{{ message.tags|default:'info' }}", 
+                    confirmButtonColor: '#630E20',
+                    timer: 3500
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto my-8 px-4 animate-fade-in">
+    <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+        <a href="{% url 'lista_produccion' %}" class="hover:text-[#D97706] transition">← Volver al Historial</a>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-2xl border border-stone-100 overflow-hidden">
+        <div class="bg-[#D97706] p-8 text-white">
+            <h2 class="text-2xl font-black flex items-center gap-3">
+                <span class="bg-white/20 p-2 rounded-xl">🥚</span> 
+                {{ titulo|default:"Registro de Producción" }}
+            </h2>
+            <p class="text-amber-100 text-sm mt-2 opacity-90">
+                Completa los datos de la jornada para el lote seleccionado.
+            </p>
+        </div>
+
+        <form method="POST" class="p-8 space-y-6 bg-stone-50/50">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl text-xs text-red-700 shadow-sm">
+                <strong>Atención:</strong> Por favor revisa los campos marcados en rojo.
+            </div>
+            {% endif %}
+
+            <div class="group">
+                <label class="block text-[10px] font-black text-stone-500 uppercase tracking-widest mb-2 group-focus-within:text-[#D97706]">Galpón / Lote</label>
+                {{ form.lote }}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-stone-100 shadow-sm">
+                    <label class="block text-[10px] font-black text-[#D97706] uppercase mb-2">Cantidad Recolectada</label>
+                    {{ form.cantidad_recolectada }}
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-stone-100 shadow-sm">
+                    <label class="block text-[10px] font-black text-rose-600 uppercase mb-2">Mortalidad / Bajas</label>
+                    {{ form.mortalidad_del_dia }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-1">
+                    <label class="block text-[10px] font-black text-stone-500 uppercase mb-2">Fecha</label>
+                    {{ form.fecha_produccion }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-black text-stone-500 uppercase mb-2">Novedades</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-[#D97706] hover:bg-[#b46205] text-white py-4 rounded-2xl font-black shadow-lg shadow-amber-500/20 transition-all uppercase tracking-widest text-sm">
+                    Registrar Jornada
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Estilo uniforme para todos los campos */
+    select, input[type="number"], input[type="date"], textarea {
+        width: 100%;
+        padding: 1rem;
+        background-color: #ffffff;
+        border: 2px solid #f0efed;
+        border-radius: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    select:focus, input:focus, textarea:focus {
+        border-color: #D97706;
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+        outline: none;
+    }
+    
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

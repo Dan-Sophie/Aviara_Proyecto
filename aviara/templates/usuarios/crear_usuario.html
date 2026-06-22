@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4 p-md-5" style="background-color: #f4f6f5; min-height: 100vh;">
+    <div class="container-fluid max-width-container">
+        
+        <header class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold tracking-tight" style="color: #630E20; font-size: 2.2rem; margin-bottom: 4px;">
+                    Registrar Usuario
+                </h1>
+                <p class="text-muted mb-0" style="font-size: 0.95rem; font-weight: 500;">
+                    Añadir un nuevo miembro al personal operativo de <span class="fw-semibold" style="color: #630E20;">Aviara</span>
+                </p>
+            </div>
+            
+            <div>
+                <a href="{% url 'lista_usuarios' %}" class="btn btn-white px-3 shadow-sm d-flex align-items-center back-btn" 
+                   style="border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #4a5568; font-weight: 600; height: 42px; transition: all 0.2s;">
+                    <span style="margin-right: 8px;"></span> Volver a la Lista
+                </a>
+            </div>
+        </header>
+
+        <div class="row g-4 align-items-stretch">
+            
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background-color: white;">
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                {% for field in form %}
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small text-uppercase" style="color: #4a5568; font-size: 0.8rem; letter-spacing: 0.5px;">
+                                            {{ field.label }}
+                                        </label>
+
+                                        {% if field.name == 'password' %}
+                                            <div class="password-field-container">
+                                                {{ field }}
+                                                <button type="button" id="togglePassword">
+                                                    <i class="bi bi-eye-fill" id="eyeIcon"></i>
+                                                </button>
+                                            </div>
+                                        {% else %}
+                                            {{ field }}
+                                        {% endif %}
+                                        
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="text-danger small mt-1 fw-medium" style="font-size: 0.85rem;">
+                                                    ⚠️ {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mt-5 pt-3 d-flex gap-3 border-top border-light">
+                                <button type="submit" class="btn text-white px-5 py-2.5 shadow-sm save-btn" style="background-color: #630E20; border-radius: 10px; font-weight: 600; transition: all 0.2s;">
+                                    🚀 Guardar Usuario
+                                </button>
+                                <a href="{% url 'lista_usuarios' %}" class="btn btn-light px-4 py-2.5 cancel-btn" 
+                                   style="border-radius: 10px; font-weight: 600; border: 1px solid #cbd5e1; color: #64748b;">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm text-white text-center p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" 
+                     style="background: linear-gradient(135deg, #630E20 0%, #35050f 100%); border-radius: 16px;">
+                    
+                    <div class="position-absolute opacity-10 end-0 bottom-0" style="font-size: 12rem; transform: translate(20px, 40px); pointer-events: none;">🏗️</div>
+
+                    <div class="position-relative z-index-10">
+                        <div class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" 
+                             style="width: 64px; height: 64px; color: #630E20; font-size: 1.8rem;">
+                            🔒
+                        </div>
+                        <h4 class="fw-bold mb-1 tracking-tight">Asignación Única</h4>
+                        <div class="py-1.5 px-3 mb-2 d-inline-block mx-auto fw-bold uppercase small" 
+                             style="border-radius: 50px; font-size: 0.7rem; letter-spacing: 0.5px; background-color: rgba(255,255,255,0.15); color: #ffffff;">
+                            Seguridad de Roles
+                        </div>
+                        
+                        <hr class="opacity-10 my-4">
+
+                        <div class="px-3">
+                            <p class="small text-uppercase fw-bold opacity-50 mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Control de Accesos</p>
+                            <p class="small text-muted mb-0 lh-base text-center" style="font-size: 0.85rem; color: #fbcfe8 !important; opacity: 0.85;">
+                                Cada cuenta creada en el sistema debe tener un rol definido para asegurar la correcta segregación de funciones dentro de la administración, la molienda y los galpones de producción.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ajustes generales del contenedor */
+    .max-width-container {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* Estilización forzada de los inputs dinámicos de Django */
+    input[type="text"], input[type="email"], input[type="password"], select {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #334155;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    input:focus, select:focus {
+        border-color: #630E20;
+        box-shadow: 0 0 0 3px rgba(99, 14, 32, 0.12);
+        outline: none;
+    }
+
+    /* Contenedor unificado para el campo de Contraseña */
+    .password-field-container {
+        display: flex !important;
+        align-items: center !important;
+        background-color: white !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 10px !important;
+        padding-right: 6px !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .password-field-container:focus-within {
+        border-color: #630E20 !important;
+        box-shadow: 0 0 0 3px rgba(99, 14, 32, 0.12) !important;
+    }
+
+    /* Desactivamos los estilos individuales del input dentro del contenedor */
+    .password-field-container input {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 10px 14px !important;
+        background: transparent !important;
+    }
+
+    /* Botón del Ojo Moderno */
+    #togglePassword {
+        background: none !important;
+        border: none !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px !important;
+        transition: transform 0.15s ease;
+    }
+
+    #togglePassword:hover {
+        transform: scale(1.08);
+    }
+
+    #togglePassword i {
+        color: #64748b !important;
+        font-size: 1.2rem !important;
+    }
+
+    /* Efectos de botones y transiciones */
+    .back-btn:hover {
+        background-color: #f8fafc !important;
+        color: #630E20 !important;
+        transform: translateY(-1px);
+    }
+
+    .save-btn:hover {
+        background-color: #4a0a18 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 14, 32, 0.2);
+    }
+
+    .cancel-btn:hover {
+        background-color: #e2e8f0;
+        color: #334155 !important;
+    }
+
+    /* Animación de entrada suave del formulario */
+    .row {
+        animation: formFadeIn 0.4s ease-out;
+    }
+
+    @keyframes formFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('togglePassword');
+        const passInput = document.querySelector('input[name="password"]');
+        const icon = document.getElementById('eyeIcon');
+
+        if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', function() {
+                const isPassword = passInput.type === 'password';
+                passInput.type = isPassword ? 'text' : 'password';
+                
+                if (isPassword) {
+                    icon.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+                    icon.style.setProperty('color', '#630E20', 'important'); // Se resalta cuando la clave es visible
+                } else {
+                    icon.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+                    icon.style.setProperty('color', '#64748b', 'important');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

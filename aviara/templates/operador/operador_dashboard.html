@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4" style="background-color: #f8faf8; min-height: 100vh; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+    
+    <header class="mb-4 d-flex justify-content-between align-items-center bg-white p-4 shadow-sm" style="border-radius: 16px;">
+        <div>
+            <h1 class="fw-extrabold m-0" style="color: #1b5e20; font-size: 2rem; letter-spacing: -1px; font-weight: 800;">Panel de Operaciones</h1>
+            <p class="text-muted fw-bold mt-1" style="font-size: 0.7rem; letter-spacing: 2.5px; text-transform: uppercase; opacity: 0.8; margin: 0;">
+                Aviara | Sistema de Gestión de Campo
+            </p>
+        </div>
+        <div class="text-end d-none d-sm-block">
+            <span class="badge px-3 py-2 fw-bold text-success bg-success bg-opacity-10 border border-success border-opacity-20" style="border-radius: 8px; font-size: 0.85rem;">
+                <i class="bi bi-circle-fill me-1 small animate-pulse"></i> Sincronizado
+            </span>
+        </div>
+    </header>
+
+    <div class="alert border-0 shadow-sm mb-4 text-dark d-flex align-items-center p-3 bg-white" style="border-radius: 16px; border-left: 6px solid #2E7D32 !important;">
+        <div class="p-2 bg-light rounded-circle me-3 text-center" style="width: 48px; height: 48px;">
+            <i class="bi bi-person-badge fs-4" style="color: #2E7D32;"></i>
+        </div>
+        <div>
+            <span class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Operador en Turno</span>
+            <strong class="d-block" style="font-size: 1.1rem; color: #2d3748;">{{ request.user.first_name|default:request.user.username }}</strong>
+        </div>
+        <div class="ms-auto text-end d-none d-sm-block">
+            <span class="text-secondary small fw-medium"><i class="bi bi-calendar3 me-1"></i> {{ fecha_hoy|date:"d \d\e F, Y" }}</span>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-white h-100" style="border-radius: 16px; background: linear-gradient(135deg, #2E7D32, #1b5e20);">
+                <small class="text-uppercase fw-bold opacity-75" style="font-size: 0.75rem;">Galpones Activos</small>
+                <div class="fs-1 fw-bold mt-1">{{ lotes_activos_conteo }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 bg-white h-100" style="border-radius: 16px; border-bottom: 4px solid #D97706;">
+                <small class="text-uppercase fw-bold text-muted" style="font-size: 0.75rem;">Registros de Hoy</small>
+                <div class="fs-1 fw-bold mt-1" style="color: #D97706;">{{ recolecciones_hoy }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 bg-white h-100" style="border-radius: 16px; border-bottom: 4px solid {% if alertas_calidad > 0 %}#C53030{% else %}#2E7D32{% endif %};">
+                <small class="text-uppercase fw-bold text-muted" style="font-size: 0.75rem;">Novedades Críticas</small>
+                <div class="fs-1 fw-bold mt-1 {% if alertas_calidad > 0 %}text-danger{% else %}text-success{% endif %}">{{ alertas_calidad }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 shadow-sm" style="border-radius: 16px;">
+        <h3 class="fw-bold mb-4 text-dark" style="font-size: 1.15rem;">Acciones Rápidas</h3>
+        <div class="row g-3 justify-content-center">
+            
+            <div class="col-6 col-md-4 col-xl-2">
+                <a href="{% url 'registrar_produccion_operador' %}" class="card border-0 bg-light p-3 text-center h-100 token-btn-hover text-decoration-none">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #E8F5E9; border-radius: 12px;">
+                        <i class="bi bi-egg-fried fs-4" style="color: #2E7D32;"></i>
+                    </div>
+                    <span class="fw-bold d-block text-dark" style="font-size: 0.85rem;">Registrar</span>
+                    <small class="text-muted d-block small">Producción</small>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <a href="{% url 'lista_produccion' %}" class="card border-0 bg-light p-3 text-center h-100 token-btn-hover text-decoration-none">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #E8F5E9; border-radius: 12px;">
+                        <i class="bi bi-journal-text fs-4" style="color: #2E7D32;"></i>
+                    </div>
+                    <span class="fw-bold d-block text-dark" style="font-size: 0.85rem;">Historial</span>
+                    <small class="text-muted d-block small">Producción</small>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <a href="{% url 'dashboard_inventario' %}" class="card border-0 bg-light p-3 text-center h-100 token-btn-hover text-decoration-none">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #DBEAFE; border-radius: 12px;">
+                        <i class="bi bi-boxes fs-4" style="color: #1E3A8A;"></i>
+                    </div>
+                    <span class="fw-bold d-block text-dark" style="font-size: 0.85rem;">Inventario</span>
+                    <small class="text-muted d-block small">Stock</small>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <a href="{% url 'crear_merma' %}" class="card border-0 bg-light p-3 text-center h-100 token-btn-hover text-decoration-none">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #FEF3C7; border-radius: 12px;">
+                        <i class="bi bi-trash-fill fs-4" style="color: #D97706;"></i>
+                    </div>
+                    <span class="fw-bold d-block text-dark" style="font-size: 0.85rem;">Reportar</span>
+                    <small class="text-muted d-block small">Merma</small>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <a href="{% url 'lista_mermas' %}" class="card border-0 bg-light p-3 text-center h-100 token-btn-hover text-decoration-none">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #FEF3C7; border-radius: 12px;">
+                        <i class="bi bi-box-seam-fill fs-4" style="color: #D97706;"></i>
+                    </div>
+                    <span class="fw-bold d-block text-dark" style="font-size: 0.85rem;">Historial</span>
+                    <small class="text-muted d-block small">Mermas</small>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .token-btn-hover { transition: all 0.25s ease; border: 2px solid transparent !important; }
+    .token-btn-hover:hover { transform: translateY(-5px); border-color: #e2e8f0 !important; background-color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05) !important; }
+    .animate-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+{% endblock %}

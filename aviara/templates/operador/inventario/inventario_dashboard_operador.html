@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto my-8 px-4 animate-fade-in">
+    
+    <div class="mb-6">
+        <a href="{% url 'dashboard_operador' %}" class="inline-flex items-center gap-2 text-xs font-black text-stone-400 hover:text-[#1E3A8A] uppercase tracking-widest transition-colors">
+            <span>←</span> Volver al Dashboard
+        </a>
+    </div>
+
+    <div class="bg-[#1E3A8A] rounded-3xl p-8 text-white shadow-xl mb-6">
+        <h2 class="text-2xl font-black flex items-center gap-3">
+            <span class="bg-white/20 p-2 rounded-xl">📦</span> 
+            Inventario en Tiempo Real
+        </h2>
+        <p class="text-blue-100 text-sm mt-2 opacity-90">
+            Estado actual de existencias por lote.
+        </p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-stone-50 border-b border-stone-100">
+                        <th class="p-6 text-[10px] font-black text-stone-500 uppercase tracking-widest">Lote / Galpón</th>
+                        <th class="p-6 text-[10px] font-black text-stone-500 uppercase tracking-widest">Estado</th>
+                        <th class="p-6 text-[10px] font-black text-stone-500 uppercase tracking-widest text-right">Existencias</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    {% for lote in lotes %}
+                    <tr class="hover:bg-blue-50/30 transition-colors">
+                        <td class="p-6">
+                            <span class="block font-bold text-stone-800">{{ lote.codigo_lote }}</span>
+                            <span class="text-xs text-stone-400">{{ lote.ubicacion|default:"Galpón General" }}</span>
+                        </td>
+                        <td class="p-6">
+                            {% if lote.esta_activo %}
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase tracking-wider">Activo</span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-[10px] font-black uppercase tracking-wider">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-6 text-right">
+                            <span class="text-xl font-black text-[#1E3A8A]">{{ lote.cantidad_actual }}</span>
+                            <span class="text-[10px] font-bold text-stone-400 ml-1">UDS</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="p-12 text-center text-stone-400 font-bold">
+                            No hay lotes disponibles en este momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

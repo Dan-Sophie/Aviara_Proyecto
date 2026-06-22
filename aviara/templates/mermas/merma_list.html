@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4" style="background-color: #fdfafb; min-height: 100vh;">
+    
+    <header class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h1 class="fw-bold" style="color: #D9383A; font-size: 2.8rem; letter-spacing: -1px; margin-bottom: 5px; font-weight: 800;">
+                Control de Mermas
+            </h1>
+            <p class="text-muted fw-bold" style="font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin: 0;">
+                Aviara | Panel de Auditoría y Ajustes de Inventario
+            </p>
+        </div>
+        
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'home' %}" class="btn btn-white border shadow-sm d-flex align-items-center px-3" 
+               style="border-radius: 10px; font-weight: 600; height: 42px; color: #495057; background-color: #ffffff;">
+                <i class="bi bi-arrow-left-short fs-4 me-1"></i> Panel Principal
+            </a>
+
+            <a href="{% url 'crear_merma' %}" class="btn text-white px-4 shadow-sm d-flex align-items-center" 
+               style="background-color: #D9383A; border-radius: 10px; font-weight: 600; height: 42px; border: none;">
+                <i class="bi bi-plus-circle-fill me-2"></i> Registrar Nueva Merma
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-dismissible fade show border-0 shadow-sm mb-4 text-white" role="alert" 
+                 style="border-radius: 12px; background-color: #D9383A;">
+                <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card border-0 shadow-sm transition-card" style="border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+        <div class="table-responsive">
+            <table class="tabla-aviara-totalmente-blanca w-100 mb-0 align-middle">
+                <thead>
+                    <tr class="text-uppercase small fw-bold" style="font-size: 0.75rem; letter-spacing: 1px; color: #D9383A;">
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Lote</th>
+                        <th class="p-4">Fecha Reporte</th>
+                        <th class="p-4">Origen / Reportado Por</th>
+                        <th class="p-4">Motivo principal</th>
+                        <th class="p-4 text-center">Cantidad</th>
+                        <th class="p-4 text-center">Estado</th>
+                        <th class="p-4 text-center">Acciones de Control</th>
+                    </tr>
+                </thead>
+                <tbody style="font-size: 0.95rem;">
+                    {% for m in mermas %}
+                    <tr>
+                        <td class="p-4 text-muted fw-medium">#{{ m.id }}</td>
+                        <td class="p-4 text-dark">
+                            <span class="badge bg-dark bg-opacity-10 text-dark border-0 px-2 py-1" style="font-size: 0.85rem;">
+                                <i class="bi bi-box-seam me-1"></i> {{ m.lote.codigo_lote }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-secondary small">{{ m.fecha_reporte|date:"d/m/Y - h:i a" }}</td>
+                        
+                        <td class="p-4">
+                            {% if m.reportado_por.is_staff %}
+                                <span class="badge bg-dark text-white px-2 py-1" style="border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
+                                    <i class="bi bi-shield-check me-1"></i> Admin ({{ m.reportado_por.username }})
+                                </span>
+                            {% else %}
+                                <span class="badge bg-light text-dark border px-2 py-1" style="border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
+                                    <i class="bi bi-person me-1"></i> Op: <strong>{{ m.reportado_por.username }}</strong>
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="p-4">
+                            <span class="badge bg-light text-secondary border px-2 py-1" style="border-radius: 6px; font-weight: 500;">{{ m.get_motivo_display|default:m.motivo }}</span>
+                        </td>
+                        
+                        <td class="p-4 text-center fw-bold" style="color: #D9383A;">- {{ m.cantidad_perdida }} unds</td>
+                        
+                        <td class="p-4 text-center">
+                            {% if m.estado == 'PENDIENTE' %}
+                                <span class="badge px-3 py-2 dynamic-badge" style="background-color: #FFF9E6; color: #B78103; border: 1px solid #FFEAA7; border-radius: 8px;">
+                                    <i class="bi bi-hourglass-split me-1"></i> Pendiente
+                                </span>
+                            {% elif m.estado == 'APROBADA' %}
+                                <span class="badge px-3 py-2 dynamic-badge" style="background-color: #E8F8F0; color: #1E7E34; border: 1px solid #C3E6CB; border-radius: 8px;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Aprobada
+                                </span>
+                            {% else %}
+                                <span class="badge px-3 py-2 dynamic-badge" style="background-color: #FDF2F2; color: #DC3545; border: 1px solid #F8D7DA; border-radius: 8px;">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Rechazada
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4 text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                {% if m.estado == 'PENDIENTE' %}
+                                    <button type="button" class="btn btn-sm btn-outline-dark px-3 fw-bold d-inline-flex align-items-center gap-1" 
+                                            style="border-radius: 8px; font-size: 0.85rem;" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalMerma{{ m.id }}">
+                                        <i class="bi bi-eye-fill"></i> Revisar Petición
+                                    </button>
+
+                                    <div class="modal fade" id="modalMerma{{ m.id }}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; text-align: left;">
+                                                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                                                    <h5 class="fw-bold text-dark m-0" style="font-size: 1.25rem;">
+                                                        <i class="bi bi-file-earmark-text-fill text-warning me-2"></i>Detalles de Petición #{{ m.id }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4 px-4">
+                                                    <p class="text-muted mb-3" style="font-size: 0.9rem;">
+                                                        Enviado por el operador <strong>@{{ m.reportado_por.username }}</strong> el {{ m.fecha_reporte|date:"d/m/Y a las h:i a" }}.
+                                                    </p>
+                                                    <div class="p-3 bg-light rounded-3 mb-3 border border-light-subtle">
+                                                        <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Lote Afectado</small>
+                                                        <span class="fw-bold text-dark"><i class="bi bi-box-seam me-1"></i> Lote: {{ m.lote.codigo_lote }}</span>
+                                                    </div>
+                                                    <div class="p-3 bg-light rounded-3 mb-3 border border-light-subtle">
+                                                        <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Cantidad Solicitada a Retirar</small>
+                                                        <span class="fw-bold text-danger"><i class="bi bi-dash-circle-fill me-1"></i> {{ m.cantidad_perdida }} unidades</span>
+                                                    </div>
+                                                    <div class="p-3 rounded-3 border" style="background-color: #FFF5F5; border-color: #f2dbdb !important;">
+                                                        <small class="text-uppercase fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px; color: #D9383A;">Observaciones del Operador (Obligatorias)</small>
+                                                        <p class="m-0 text-dark fw-medium" style="font-size: 0.95rem; white-space: pre-line;">{{ m.observaciones }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-0 pb-4 px-4 d-flex gap-2 justify-content-end">
+                                                    <button type="button" class="btn btn-light border fw-bold" data-bs-dismiss="modal" style="border-radius: 10px;">Cerrar</button>
+                                                    
+                                                    <a href="{% url 'rechazar_merma' m.id %}" class="btn text-white fw-bold px-3 d-inline-flex align-items-center gap-1" 
+                                                       style="background-color: #dc3545; border-radius: 10px;"
+                                                       onclick="return confirm('¿Rechazar definitivamente esta solicitud?');">
+                                                        <i class="bi bi-x-lg"></i> Rechazar
+                                                    </a>
+                                                    <a href="{% url 'aprobar_merma' m.id %}" class="btn text-white fw-bold px-3 d-inline-flex align-items-center gap-1" 
+                                                       style="background-color: #198754; border-radius: 10px;"
+                                                       onclick="return confirm('¿Aprobar esta merma? Se descontará el stock inmediatamente.');">
+                                                        <i class="bi bi-check-lg"></i> Aprobar e Impactar Stock
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% else %}
+                                    <span class="text-muted small fw-bold text-uppercase d-inline-flex align-items-center gap-1" style="font-size: 0.75rem; opacity: 0.6;">
+                                        {% if m.reportado_por.is_staff and m.estado == 'APROBADA' %}
+                                            <i class="bi bi-lightning-auto text-success fs-6"></i> Directa de Admin
+                                        {% else %}
+                                            <i class="bi bi-file-earmark-lock2-fill fs-6"></i> Auditado
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="p-5 text-center">
+                            <i class="bi bi-clipboard-x text-muted opacity-25 d-block mb-2" style="font-size: 3.5rem;"></i>
+                            <p class="text-muted fw-bold mb-0">No se registran mermas en la bitácora de la granja.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 🌟 Tabla Limpia e Inyección de Blanco Puro Total en Todo */
+    .tabla-aviara-totalmente-blanca {
+        border-collapse: collapse;
+        background-color: #ffffff !important;
+    }
+    
+    /* Forzar fondo blanco y borde sutil inferior en la cabecera, quitando el tono coral */
+    .tabla-aviara-totalmente-blanca thead {
+        background-color: #ffffff !important;
+    }
+    
+    .tabla-aviara-totalmente-blanca th {
+        background-color: #ffffff !important;
+        border-bottom: 2px solid #f6f6f6 !important;
+        font-weight: 700;
+    }
+    
+    /* Celdas del cuerpo totalmente blancas */
+    .tabla-aviara-totalmente-blanca tbody tr {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #f8f8f8 !important;
+    }
+    
+    /* Hover ultra ligero con destello carmesí corporativo */
+    .tabla-aviara-totalmente-blanca tbody tr:hover { 
+        background-color: rgba(217, 56, 58, 0.02) !important; 
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .dynamic-badge {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    
+    .transition-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+</style>
+{% endblock %}

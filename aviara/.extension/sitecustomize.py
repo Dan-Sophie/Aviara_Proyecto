@@ -1,0 +1,1 @@
+# Failed to load sitecustomize.py: Error: ENOENT: no such file or directory, open 'c:\Users\AdminSena\.vscode\extensions\dant2021.error-context-collector-0.1.7\src\languages\buffers\sitecustomize.py'

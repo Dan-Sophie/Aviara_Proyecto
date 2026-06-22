@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto my-8 px-4 animate-fade-in">
+    <div class="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
+        <a href="{% url 'lista_produccion' %}" class="hover:text-[#0D5C3A] transition">Historial</a>
+        <span>/</span>
+        <span class="text-gray-600">Nuevo Registro Administrativo</span>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden grid grid-cols-1 lg:grid-cols-3">
+        
+        <div class="bg-gradient-to-br from-[#0D5C3A] to-[#08291B] p-8 text-white flex flex-col justify-between lg:border-r border-gray-200">
+            <div>
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-2xl mb-6 text-xl">
+                    📊
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight leading-tight">
+                    Registrar Producción Diaria
+                </h2>
+                <p class="text-green-100/70 text-sm mt-3 leading-relaxed">
+                    Como <strong>Administrador General</strong>, usted tiene la facultad de ingresar recolecciones extemporáneas o respaldar el trabajo de campo asignando el reporte al operador que ejecutó la tarea física.
+                </p>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/10 space-y-2 text-xs text-green-100/60">
+                <p>⚠️ Todo dato guardado alterará directamente los gráficos de balance mensual, el stock disponible para ventas y los cálculos de mortalidad promedio.</p>
+            </div>
+        </div>
+
+        <form method="POST" class="lg:col-span-2 p-8 md:p-10 space-y-6 bg-stone-50/50" novalidate>
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl flex items-start gap-3">
+                <span class="text-red-500 text-lg">⚠️</span>
+                <div>
+                    <h4 class="text-sm font-bold text-red-800">Inconsistencia en los campos</h4>
+                    <p class="text-xs text-red-700 mt-0.5">Por favor verifique que las cantidades sean numéricas y que los lotes seleccionados se encuentren activos.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">👤 Operario de Campo Responsable</label>
+                {{ form.usuario }}
+                <p class="text-[11px] text-gray-400 mt-1.5">Seleccione el colaborador que realizó la recolección física en los galpones.</p>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-1 border-b border-gray-100">1. Origen del Reporte</h3>
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Lote / Galpón de Origen</label>
+                        {{ form.lote }}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-1 border-b border-gray-100">2. Balance de Campo y Sanidad</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                        <label class="block text-xs font-bold text-green-700 uppercase mb-2">📦 Cantidad Recolectada (Uds)</label>
+                        {{ form.cantidad_recolectada }}
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                        <label class="block text-xs font-bold text-red-600 uppercase mb-2">🪶 Mortalidad / Bajas del Día</label>
+                        {{ form.mortalidad_del_dia }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="md:col-span-1">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Fecha del Reporte</label>
+                    {{ form.fecha_produccion }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Novedades u Observaciones Clínicas</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 pt-6 border-t border-gray-100 bg-white -mx-8 -mb-10 p-8 lg:-mx-10">
+                <a href="{% url 'lista_produccion' %}" class="w-full sm:w-auto px-6 py-3 text-center text-sm font-bold text-gray-500 hover:bg-gray-50 rounded-xl transition">
+                    Cancelar y Regresar
+                </a>
+                <button type="submit" class="w-full sm:flex-1 bg-[#0D5C3A] hover:bg-[#094229] text-white py-3 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 text-center tracking-wide uppercase text-sm">
+                    Ingresar Registro al Inventario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .animate-fade-in {
+        animation: dashboardFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes dashboardFade {
+        from { opacity: 0; transform: scale(0.98) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+</style>
+{% endblock %}
