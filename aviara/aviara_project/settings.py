@@ -14,7 +14,11 @@ SECRET_KEY = 'django-insecure-r2km429&04=8h_3q8ju09i44p5u3mb+8mr72rlmb3&vnmibd=-
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'aviara-project-django.onrender.com',  # El dominio de Render
+    'localhost',                           # Para que siga funcionando en tu PC
+    '127.0.0.1',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
