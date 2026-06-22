@@ -1,8 +1,0 @@
-<h1>DEBUG: Total de pedidos en BD: {{ conteo }}</h1>
-<ul>
-    {% for p in pedidos_pedientes %}
-        <li>Pedido ID: {{ p.id }} - Distribuidor ID del pedido: {{ p.distribuidor_id }}</li>
-    {% empty %}
-        <li>La lista está vacía.</li>
-    {% endfor %}
-</ul>
